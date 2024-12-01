@@ -1,24 +1,39 @@
-import logo from './logo.svg';
-import './App.css';
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+
+import Navbar from './Navbar';
+import Home from './Home';
+import Login from './login_components/Login';
+import Signup from './login_components/Signup';
+import Subscribe from './chatbot_components/subscribe';
+import CreateChatbot from './chatbot_components/createChatbot';
+import Dashboard from './chatbot_components/dashboard';
+import ChatBox from './chatbot_components/chatBox';
+import Project from './db_components/Project';
+import User from './db_components/User';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <>
+    <Navbar/>
+    <div className="container">
+      
+      <Routes>
+        {/*Home page component */}
+        <Route path="/" element ={<Home/>}/>
+        {/*Login page components */}
+        <Route path="/Login" element={<Login/>}/>
+        <Route path="/Signup" element={<Signup/>}/>
+        <Route path="/user/:usrid" element={<User/>}/>
+        {/*Project creation/customization components */}
+        <Route path="/Subscribe" element={<Subscribe/>}/>
+        <Route path="/CreateChatbot" element={<CreateChatbot/>}/>
+        <Route path="/Dashboard" element={<Dashboard/>}/>
+        <Route path="/project/:projid" element={<Project/>}/>
+        <Route path="/chatbot/:projid" element={<ChatBox/>}/>
+      </Routes>
+      
     </div>
+    </>
   );
 }
 
