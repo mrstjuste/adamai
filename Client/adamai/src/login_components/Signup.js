@@ -11,6 +11,7 @@ import {
 } from '@mui/material';
 
 const SignUp = () => {
+    const [email, setEmail] = useState('');
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [username, setUsername] = useState('');
@@ -25,6 +26,7 @@ const SignUp = () => {
 
         try {
             await axios.post('http://localhost:9000/createUser', {
+                email,
                 firstName,
                 lastName,
                 username,
@@ -58,6 +60,14 @@ const SignUp = () => {
                 )}
 
                 <Box component="form" onSubmit={handleSignUp} sx={{ width: '100%' }}>
+                    <TextField
+                        label="Email"
+                        variant="outlined"
+                        fullWidth
+                        margin="normal"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                    />
                     <TextField
                         label="First Name"
                         variant="outlined"

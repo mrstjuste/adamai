@@ -1,36 +1,31 @@
 const express = require('express');
 const cors = require('cors');
-const app = express();
-const { handleUserInput } = require('./chatbot');
-// // Schemas
+const mongoose = require('mongoose');
 const User = require('./schemas/baseSchemas/User');
-const ChatBot = require('./schemas/baseSchemas/ChatBot');
-const Subscription = require('./schemas/simpleSchemas/Subscription');
-const KnowledgeLevel = require('./schemas/simpleSchemas/KnowledgeLevel');
-const LanguageStyle = require('./schemas/simpleSchemas/LanguageStyle');
-const PersonalityTrait = require('./schemas/simpleSchemas/PersonalityTrait');
 
+const app = express();
 app.use(express.json());
-app.use(cors())
+app.use(cors());
 
-app.listen(9000, ()=> {
-    console.log('Server Started at ${9000}')
-})
+const mongoString = process.env.MONGO_URI || "Enter info here.";
+mongoose.connect(mongoString, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    serverSelectionTimeoutMS: 30000
+});
 
- const mongoose = require('mongoose');
-// // "mongodb+srv://your_username:your_password@cluster0.uxnmmuy.mongodb.net/lab"
- const mongoString = "mongodb+srv://your_username:your_password@cluster0.uxnmmuy.mongodb.net/lab"
-const database = mongoose.connection
+const database = mongoose.connection;
+database.on('error', (error) => console.log(error));
+database.once('connected', () => console.log('Database Connected'));
 
-database.on('error', (error) => console.log(error))
-
-database.once('connected', () => console.log('Databased Connected'))
-
-// // User methods
+app.listen(9000, () => {
+    console.log(`Server Started at ${9000}`);
+});
 
 app.post('/createUser', async (req, res) => {
     try {
         const user = new User({
+            email: req.body.email,
             username: req.body.username,
             firstName: req.body.firstName,
             lastName: req.body.lastName,
@@ -45,6 +40,19 @@ app.post('/createUser', async (req, res) => {
         }
         console.error("Error creating user:", error);
         return res.status(500).send("Internal Server Error");
+    }
+});
+
+app.get('/getUser', async (req, res) => {
+    console.log(`SERVER: GET USER REQ BODY: ${req.query}`);
+    const username = req.query.username;
+    const password = req.query.password;
+    console.log(username);
+    try {
+        const user = await User.findOne({ username });
+        return res.status(200).send(user)
+    } catch (error) {
+        res.status(500).send(error);
     }
 });
 

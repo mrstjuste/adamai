@@ -57,7 +57,7 @@ export default function Navbar() {
                     ) : (
                         <CustomLink to="/Login">Log In</CustomLink>
                     )}
-                    {loggedInUser && (
+                    {!loggedInUser && (
                         <CustomLink to="/Signup">Sign Up</CustomLink>
                     )}
                 </Box>
