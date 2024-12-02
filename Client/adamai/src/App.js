@@ -10,6 +10,7 @@ import Dashboard from './chatbot_components/dashboard';
 import ChatBox from './chatbot_components/chatBox';
 import Project from './db_components/Project';
 import User from './db_components/User';
+import CreateSimpleComponents from './hidden_components/createSimpleComponents'
 
 function App() {
   return (
@@ -30,6 +31,8 @@ function App() {
         <Route path="/Dashboard" element={<Dashboard/>}/>
         <Route path="/project/:projid" element={<Project/>}/>
         <Route path="/chatbot/:projid" element={<ChatBox/>}/>
+        {/*Dev components*/}
+        <Route path="/CreateSimpleComponents" element={<CreateSimpleComponents/>}/>
       </Routes>
       
     </div>

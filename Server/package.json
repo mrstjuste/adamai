@@ -9,7 +9,9 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@langchain/community": "^0.3.16",
     "@langchain/core": "^0.3.19",
+    "@langchain/mongodb": "^0.1.0",
     "@langchain/openai": "^0.3.14",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
@@ -18,7 +20,8 @@
     "mongodb": "^6.11.0",
     "mongoose": "^8.8.3",
     "openai": "^4.73.1",
-    "uuid": "^11.0.3"
+    "uuid": "^11.0.3",
+    "web-streams-polyfill": "^4.0.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.7"

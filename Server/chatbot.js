@@ -1,4 +1,8 @@
-const { OpenAI } = require('langchain/chat_models');
+const { OpenAI } = require('@langchain/openai');
+const dotenv = require('dotenv');
+
+// Load environment variables from .env file
+dotenv.config();
 
 // Function to update config with JSON input
 function updateConfigWithJson(jsonInput) {
@@ -35,7 +39,10 @@ let config = {
 };
 
 // Initialize the LangChain model with the configuration
-const chatBot = new OpenAI(config);
+const chatBot = new OpenAI({
+    ...config,
+    apiKey: process.env.OPENAI_API_KEY // Use the API key from the environment variables
+});
 
 // Example function to handle user input and generate a response
 async function handleUserInput(userInput) {

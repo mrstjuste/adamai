@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
 import { Box, TextField, Typography, Button, Select, MenuItem, InputLabel, FormControl } from '@mui/material';
+import axios from 'axios';
 
 const CreateChatbot = () => {
+    // logged in user
+    const loggedInUser = localStorage.getItem('loggedInUser');
     // Predefined options for dropdowns
     const personalityOptions = ['Friendly', 'Professional', 'Humorous', 'Empathetic', 'Authoritative'];
     const knowledgeLevelOptions = ['Basic', 'Intermediate', 'Advanced', 'Expert'];
@@ -13,26 +16,46 @@ const CreateChatbot = () => {
     const [audience, setAudience] = useState('');
     const [selectedPersonalities, setSelectedPersonalities] = useState([]);
     const [knowledge, setKnowledge] = useState('');
-    const [selectedLanguageStyles, setSelectedLanguageStyles] = useState('');
+    const [selectedLanguageStyles, setSelectedLanguageStyles] = useState([]);
     const [keyFunctionalities, setKeyFunctionalities] = useState('');
     const [customResponse, setCustomResponse] = useState('');
     const [fallbackBehavior, setFallBackBehavior] = useState('');
     const [privacyNeeds, setPrivacyNeeds] = useState('');
+    const [error, setError] = useState(null); // To handle error messages
+    const [success, setSuccess] = useState(null);
 
     const handleCreateChatBot = async (event) => {
         event.preventDefault();
-        console.log({
-            botName,
-            purpose,
-            audience,
-            selectedPersonalities,
-            knowledge,
-            selectedLanguageStyles,
-            keyFunctionalities,
-            customResponse,
-            fallbackBehavior,
-            privacyNeeds,
-        });
+
+        setError(null);
+        setSuccess(null);
+
+        try {
+            const response = await axios.post('http://localhost:9000/CreateChatbot', {
+                owner: loggedInUser,
+                name: botName,
+                purpose: purpose,
+                knowledgeLevel: knowledge,
+                languageStyles: selectedLanguageStyles,
+                personalityTraits: selectedPersonalities,
+                keyFunctionalities: keyFunctionalities,
+                fallBackBehavior: fallbackBehavior,
+                privacyNeeds: privacyNeeds
+            });
+            setBotName('')
+            setPurpose('')
+            setKnowledge('')
+            setSelectedLanguageStyles([])
+            setSelectedPersonalities([])
+            setKeyFunctionalities('')
+            setFallBackBehavior('')
+            setPrivacyNeeds('')
+            setAudience('')
+            setCustomResponse('')
+            setSuccess("Success! " + botName + " has been created!")
+        } catch (err) {
+            setError(`Error posting data: ${err.response ? err.response.data : err.message}`);
+        }    
     };
 
     return (
@@ -40,6 +63,8 @@ const CreateChatbot = () => {
             <Typography variant="h4" component="h1" gutterBottom>
                 Create a Chatbot
             </Typography>
+            {success && <Typography variant="h6" color="green">{success}</Typography>}
+            {error && <Typography variant="h6" color="red">{error}</Typography>}
             <form onSubmit={handleCreateChatBot}>
                 <TextField
                     label="Chatbot Name"
@@ -75,6 +100,7 @@ const CreateChatbot = () => {
                         value={selectedPersonalities}
                         onChange={(e) => setSelectedPersonalities(e.target.value)}
                         renderValue={(selected) => selected.join(', ')}
+                        required
                     >
                         {personalityOptions.map((personality, index) => (
                             <MenuItem key={index} value={personality}>
@@ -102,8 +128,10 @@ const CreateChatbot = () => {
                 <FormControl fullWidth margin="normal">
                     <InputLabel>Preferred Language Style</InputLabel>
                     <Select
+                        multiple
                         value={selectedLanguageStyles}
                         onChange={(e) => setSelectedLanguageStyles(e.target.value)}
+                        renderValue={(selected) => selected.join(', ')}
                         required
                     >
                         {languageStyleOptions.map((style, index) => (

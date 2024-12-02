@@ -1,13 +1,20 @@
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
+const dotenv = require('dotenv');
+const { handleUserInput, updateConfigWithJson } = require('./chatbot');
+
 const User = require('./schemas/baseSchemas/User');
+const Chatbot = require('./schemas/baseSchemas/ChatBot');
+const Subscription = require('./schemas/simpleSchemas/Subscription')
+
+dotenv.config();
 
 const app = express();
 app.use(express.json());
 app.use(cors());
 
-const mongoString = process.env.MONGO_URI || "Enter info here.";
+const mongoString = process.env.MONGO_URI;
 mongoose.connect(mongoString, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
@@ -80,20 +87,43 @@ app.get('/getUsers', async (req, res) => {
     }
 })
 
-// // chat bot methods
+// chat bot methods
+
+app.post('/CreateChatbot', async (req, res) => {
+    try {
+        const owner = await User.findOne({username: req.body.owner});
+        console.log(owner)
+        const chatbot = new Chatbot({
+            owner: owner,
+            name: req.body.name,
+            purpose: req.body.purpose,
+            audience: req.body.audience,
+            knowledgeLevel: req.body.knowledgeLevel,
+            languageStyles: req.body.languageStyle,
+            personalityTraits: req.body.personalityTraits,
+            keyFunctionalities: req.body.keyFunctionalities,
+            fallBackBehavior: req.body.fallBackBehavior,
+            privacyNeeds: req.body.privacyNeeds
+        });
+        await chatbot.save();
+        res.status(200).send("Success! Added chatbot!");
+    } catch (error) {
+        res.status(500).json({ error: 'Error generating response' });
+    }
+});
 
 // Create an endpoint to handle user input
-// app.post('/sendMessage', async (req, res) => {
-//     const userInput = req.body.input;
-//     try {
-//         const response = await handleUserInput(userInput);
-//         res.json({ response });
-//     } catch (error) {
-//         res.status(500).json({ error: 'Error generating response' });
-//     }
-// });
+app.post('/sendMessage', async (req, res) => {
+    const userInput = req.body.input;
+    try {
+        const response = await handleUserInput(userInput);
+        res.json({ response });
+    } catch (error) {
+        res.status(500).json({ error: 'Error generating response' });
+    }
+});
 
-// // Input methods?
+// Input methods?
 
 app.get('/getSubscriptions', async (req, res) => {
     try {
@@ -105,32 +135,30 @@ app.get('/getSubscriptions', async (req, res) => {
     }
 })
 
-app.get('/getKnowledgeLevels', async (req, res) => {
-    try {
-        const knowledgeLevelList = await KnowledgeLevel.find();
-        res.send(knowledgeLevelList)
-    }
-    catch (error) {
-        res.status(500).send(error)
-    }
-})
+// Dev methods
 
-app.get('/getLanguageStyles', async (req, res) => {
-    try {
-        const LanguageStyleList = await LanguageStyle.find();
-        res.send(LanguageStyleList)
+app.post('/postComponents', async (req, res) => {
+    console.log(req);
+    try{
+        if(req.body.KnowledgeLevel){
+            let knowledgeLevel = new KnowledgeLevel({level : req.body.KnowledgeLevel})
+            knowledgeLevel.save();
+        }
+        if(req.body.LanguageStyle){
+            let languageStyle = new LanguageStyle({style : req.body.LanguageStyle})
+            languageStyle.save();
+        }
+        if(req.body.PersonalityTrait){
+            let personalityTrait = new PersonalityTrait({trait : req.body.PersonalityTrait})
+            personalityTrait.save();
+        }
+        if(req.body.Subscription){
+            let subscription = new Subscription({name : req.body.Subscription, price : req.body.price})
+            subscription.save();
+        }
+        return res.status(200).send("Ok");
     }
-    catch (error) {
-        res.status(500).send(error)
-    }
-})
-
-app.get('/getPersonalityTraits', async (req, res) => {
-    try {
-        const PersonalityTraitList = await PersonalityTrait.find();
-        res.send(PersonalityTraitList)
-    }
-    catch (error) {
+    catch(error){
         res.status(500).send(error)
     }
 })
