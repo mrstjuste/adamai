@@ -51,7 +51,7 @@ const Chatbox = () => {
     "Is there anything else you'd like to know?",
   ];
 
-  const sendMessage = (event) => {
+  const sendMessage = async (event) => {
     event.preventDefault();
     if (userInput.trim() === '') return;
 
@@ -59,18 +59,21 @@ const Chatbox = () => {
     const userMessage = { sender: 'User', text: userInput };
     setChatLog((prevLog) => [...prevLog, userMessage]);
 
-    // Clear input
+    // Clear the input field
     setUserInput('');
 
-    // Simulate bot response
-    const botResponse = {
-      sender: 'Bot',
-      text: botResponses[chatLog.length % botResponses.length],
-    };
-    setTimeout(() => {
-      setChatLog((prevLog) => [...prevLog, botResponse]);
-    }, 500); // Simulate response delay
-  };
+    try {
+        //Sends users input to the /sendMessage endpoint in the backend(chatbot.js)
+        const response = await axios.post('http://localhost:9000/sendMessage', { input: userInput });
+        //Sends the bots response to the log
+        const botResponse = { sender: 'Bot', text: response.data.response };
+        setChatLog((prevLog) => [...prevLog, botResponse]);
+    } catch (error) {
+        console.error("Error sending message:", error);
+        const errorResponse = { sender: 'Bot', text: "Sorry, there was an error processing your request." };
+        setChatLog((prevLog) => [...prevLog, errorResponse]);
+    }
+};
 
   return (
     <ChatContainer>

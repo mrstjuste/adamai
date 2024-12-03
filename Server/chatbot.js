@@ -55,4 +55,14 @@ async function handleUserInput(userInput) {
     }
 }
 
+app.post('/sendMessage', async (req, res) => {
+    const userInput = req.body.input;
+    try {
+        const response = await handleUserInput(userInput);
+        res.json({ response });
+    } catch (error) {
+        res.status(500).json({ error: 'Error generating response' });
+    }
+});
+
 module.exports = { handleUserInput, updateConfigWithJson };
