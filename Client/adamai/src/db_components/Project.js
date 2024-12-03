@@ -9,7 +9,8 @@ const Project = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    // Fetch project data based on projId
+    alert(projId)
+    //Fetch project data based on projId
     useEffect(() => {
         axios
             .get(`http://localhost:9000/projects/${projId}`)

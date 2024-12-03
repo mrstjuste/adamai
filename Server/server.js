@@ -112,6 +112,25 @@ app.post('/CreateChatbot', async (req, res) => {
     }
 });
 
+app.post('/getProjects', async (req, res) => {
+    try {
+      const user = await User.findOne({ username: req.body.loggedInUser });
+      const projects = await Chatbot.find({ owner: user });
+      return res.status(200).json(projects);
+    } catch (error) {
+      res.status(500).json({ error: 'Error retrieving projects' });
+    }
+  });
+
+app.get('/getProject', async (req, res) => {
+    try{
+        const project = await Chatbot.find({botName : req.body.botName})
+        return res.status(200).json(project)
+    } catch(error){
+        res.status(500).json({ error: 'Error Retrieving projects' });
+    }
+})
+
 // Create an endpoint to handle user input
 app.post('/sendMessage', async (req, res) => {
     const userInput = req.body.input;
@@ -137,28 +156,28 @@ app.get('/getSubscriptions', async (req, res) => {
 
 // Dev methods
 
-app.post('/postComponents', async (req, res) => {
-    console.log(req);
-    try{
-        if(req.body.KnowledgeLevel){
-            let knowledgeLevel = new KnowledgeLevel({level : req.body.KnowledgeLevel})
-            knowledgeLevel.save();
-        }
-        if(req.body.LanguageStyle){
-            let languageStyle = new LanguageStyle({style : req.body.LanguageStyle})
-            languageStyle.save();
-        }
-        if(req.body.PersonalityTrait){
-            let personalityTrait = new PersonalityTrait({trait : req.body.PersonalityTrait})
-            personalityTrait.save();
-        }
-        if(req.body.Subscription){
-            let subscription = new Subscription({name : req.body.Subscription, price : req.body.price})
-            subscription.save();
-        }
-        return res.status(200).send("Ok");
-    }
-    catch(error){
-        res.status(500).send(error)
-    }
-})
+// app.post('/postComponents', async (req, res) => {
+//     console.log(req);
+//     try{
+//         if(req.body.KnowledgeLevel){
+//             let knowledgeLevel = new KnowledgeLevel({level : req.body.KnowledgeLevel})
+//             knowledgeLevel.save();
+//         }
+//         if(req.body.LanguageStyle){
+//             let languageStyle = new LanguageStyle({style : req.body.LanguageStyle})
+//             languageStyle.save();
+//         }
+//         if(req.body.PersonalityTrait){
+//             let personalityTrait = new PersonalityTrait({trait : req.body.PersonalityTrait})
+//             personalityTrait.save();
+//         }
+//         if(req.body.Subscription){
+//             let subscription = new Subscription({name : req.body.Subscription, price : req.body.price})
+//             subscription.save();
+//         }
+//         return res.status(200).send("Ok");
+//     }
+//     catch(error){
+//         res.status(500).send(error)
+//     }
+// })

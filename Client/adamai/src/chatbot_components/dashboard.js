@@ -35,19 +35,18 @@ const Dashboard = () => {
   const hasPurchased = localStorage.getItem('hasPurchased');
   const navigate = useNavigate();
 
-  // Fetch projects associated with the logged-in user
-//   useEffect(() => {
-//     if (loggedInUser) {
-//       axios
-//         .get(`http://localhost:9000/projects?user=${loggedInUser}`)
-//         .then((response) => {
-//           setProjects(response.data); // Assuming the API returns an array of projects
-//         })
-//         .catch((error) => {
-//           console.error('Error fetching projects:', error);
-//         });
-//     }
-//   }, [loggedInUser]);
+  useEffect(() => {
+    if (loggedInUser) {
+      axios
+        .post('http://localhost:9000/getProjects', { loggedInUser })
+        .then((response) => {
+          setProjects(response.data); // Assuming the API returns an array of projects
+        })
+        .catch((error) => {
+          console.error('Error fetching projects:', error);
+        });
+    }
+  }, [loggedInUser]);
 
   return (
     <DashboardContainer>
@@ -68,7 +67,7 @@ const Dashboard = () => {
                   </Typography>
                   <ProjectButton
                     fullWidth
-                    onClick={() => navigate(`/projects/${project.id}`)}
+                    onClick={() => navigate(`/chatbot/${project._id}`)}
                   >
                     View Project
                   </ProjectButton>
