@@ -57,6 +57,9 @@ app.get('/getUser', async (req, res) => {
     console.log(username);
     try {
         const user = await User.findOne({ username });
+        if (password !== user.password) {
+            return res.status(401).send("Incorrect password");
+          }
         return res.status(200).send(user)
     } catch (error) {
         res.status(500).send(error);
