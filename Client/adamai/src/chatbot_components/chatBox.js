@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Box, TextField, Button, Typography, List, ListItem, ListItemText, Paper } from '@mui/material';
 import { styled } from '@mui/material/styles';
+import axios from "axios";
 
 const ChatContainer = styled(Box)`
   display: flex;
