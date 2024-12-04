@@ -29,7 +29,7 @@ const CreateChatbot = () => {
 
         setError(null);
         setSuccess(null);
-
+        console.log(selectedLanguageStyles)
         try {
             const response = await axios.post('http://localhost:9000/CreateChatbot', {
                 owner: loggedInUser,
@@ -126,7 +126,7 @@ const CreateChatbot = () => {
                 </FormControl>
 
                 <FormControl fullWidth margin="normal">
-                    <InputLabel>Preferred Language Style</InputLabel>
+                    <InputLabel>Language Styles</InputLabel>
                     <Select
                         multiple
                         value={selectedLanguageStyles}
@@ -134,9 +134,9 @@ const CreateChatbot = () => {
                         renderValue={(selected) => selected.join(', ')}
                         required
                     >
-                        {languageStyleOptions.map((style, index) => (
-                            <MenuItem key={index} value={style}>
-                                {style}
+                        {languageStyleOptions.map((languageStyle, index) => (
+                            <MenuItem key={index} value={languageStyle}>
+                                {languageStyle}
                             </MenuItem>
                         ))}
                     </Select>
