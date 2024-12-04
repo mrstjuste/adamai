@@ -101,8 +101,8 @@ app.post('/CreateChatbot', async (req, res) => {
             name: req.body.name,
             purpose: req.body.purpose,
             audience: req.body.audience,
-            knowledgeLevel: req.body.knowledgeLevel,
-            languageStyles: req.body.languageStyle,
+            knowledgeLevel: req.body.knowledgeLevely,
+            languageStyles: req.body.languageStyles,
             personalityTraits: req.body.personalityTraits,
             keyFunctionalities: req.body.keyFunctionalities,
             fallBackBehavior: req.body.fallBackBehavior,
@@ -134,12 +134,23 @@ app.get('/getProject', async (req, res) => {
     }
 })
 
+app.post('/configureChatBot', async (req,res) => {
+    try{
+        const chatbot = await Chatbot.find({_id : req.body.projId});
+        console.log(chatbot)
+        updateConfigWithJson(chatbot);
+        return res.status(200).send("Sucessfully loaded the chatbot.");
+    } catch(error){
+        return res.status(500).send("Unable to configure chatbot.");
+    }
+});
+
 // Create an endpoint to handle user input
 app.post('/sendMessage', async (req, res) => {
     const userInput = req.body.input;
     try {
         const response = await handleUserInput(userInput);
-        res.json({ response });
+        res.json({ response: response.content });
     } catch (error) {
         res.status(500).json({ error: 'Error generating response' });
     }
