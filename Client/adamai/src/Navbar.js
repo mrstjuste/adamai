@@ -40,7 +40,7 @@ export default function Navbar() {
                 <Box>
                     <CustomLink to="/">Home</CustomLink>
                     {!hasPurchased && (
-                        <CustomLink to="/Login">Subscribe</CustomLink>
+                        <CustomLink to="/Subscribe">Subscribe</CustomLink>
                     )}
                     {loggedInUser ? (
                         <CustomLink to="/CreateChatbot">Create</CustomLink>
