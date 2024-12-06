@@ -2,66 +2,13 @@
 // npm install @langchain/openai dotenv openai
 // npm install body-parser
 // npm install express
+const dotenv = require('dotenv');
+dotenv.config(); // Load environment variables first
 
 const { ChatOpenAI } = require('@langchain/openai');
-const dotenv = require('dotenv');
+const { PromptTemplate } = require('@langchain/core/prompts');
+const { LLMChain } = require('langchain/chains');
 
-dotenv.config();
-
-const defaultLayout = {
-    name: "ChatBot",
-    purpose: "To assist users with information, support, and engaging conversations.",
-    audience: "General audience, including students, professionals, and casual users.",
-    personalityTraits: ["friendly", "helpful", "knowledgeable", "empathetic"],
-    knowledgeLevel: "Expert",
-    languageStyle: "Conversational, approachable, and clear.",
-    keyFunctions: [
-        "Answering questions",
-        "Providing information",
-        "Engaging in small talk",
-        "Offering support and advice",
-    ],
-    customResponses: {
-        greeting: "Hello! How can I assist you today?",
-        farewell: "Goodbye! Have a great day!",
-        fallback: "I'm sorry, I didn't quite understand that. Could you please rephrase?",
-    },
-    fallbackBehavior: "Provide a polite and helpful response asking for clarification.",
-    privacyNeeds: "Ensure user data is not stored or shared without consent.",
-};
-
-function updateConfigWithJson(jsonInput) {
-    try {
-        const cleanedConfig = processData(jsonInput)
-        const newConfig = JSON.parse(cleanedConfig);
-        config = newConfig
-        console.log("Configuration updated successfully:", config);
-    } catch (error) {
-        console.error("Error parsing the JSON input:", error.message);
-    }
-}
-
-const cleanInput = (data) => {
-    return JSON.stringify(data.map(item => {
-      const { _id, owner, __v, ...rest } = item;
-      return rest;
-    }), null, 2);
-  };
-
-  const processData = (data) => {
-    return data.map(item => {
-      item.languageStyles = typeof item.languageStyles === 'string' 
-        ? item.languageStyles.split(',').map(style => style.trim()) 
-        : item.languageStyles;
-  
-      item.personalityTraits = typeof item.personalityTraits === 'string' 
-        ? item.personalityTraits.split(',').map(trait => trait.trim()) 
-        : item.personalityTraits;
-  
-      return item;
-    });
-  };
-let config = defaultLayout;
 
 const chatBot = new ChatOpenAI({
     model: "gpt-4",
@@ -69,18 +16,74 @@ const chatBot = new ChatOpenAI({
     openAIApiKey: process.env.OPENAI_API_KEY,
 });
 
-async function handleUserInput(userInput) {
-    if(process.env.MOCK_MODE === "true"){
-        return {content: "Placeholder response."}
+// Define the template with placeholders
+const template = `
+    You are a chatbot with the following configuration:
+    Name: {{name}}
+    Purpose: {{purpose}}
+    Audience: {{audience}}
+    Language Styles: {{languageStyle}}
+    Personality Traits: {{personalityTraits}}
+    Key Functions: {{keyFunctions}}
+    Fallback Behavior: {{fallbackBehavior}}
+    Knowledge Level: {{knowledgeLevel}}
+    Privacy Needs: {{privacyNeeds}}
+    
+    Now, answer the following question:
+    {question}
+`;
+
+let prompt = PromptTemplate.fromTemplate(template);
+
+// Create the LLMChain with the initial prompt
+const chain = new LLMChain({
+    llm: chatBot,
+    prompt: prompt
+});
+
+// Function to update config with MongoDB data
+function updateConfigWithMongoData(configData) {
+    try {
+        const promptString = mapTemplateToData(template, configData[0]);
+        //console.log(promptString)
+        prompt = PromptTemplate.fromTemplate(promptString); // Update the prompt template with new data
+        //console.log(prompt)
+        chain.prompt = prompt; // Recreate the chain with updated prompt
+        console.log(chain)
+    } catch (error) {
+        console.error("Error updating config with MongoDB data:", error.message);
     }
-    else{
+}
+
+// Mapping template placeholders to actual data from MongoDB object
+function mapTemplateToData(template, data) {
+    //console.log(data)
+    return template
+        .replace("{{name}}", data.name || "")
+        .replace("{{purpose}}", data.purpose || "")
+        .replace("{{audience}}", data.audience || "")
+        .replace("{{languageStyle}}", data.languageStyles || "")
+        .replace("{{personalityTraits}}", data.personalityTraits || "")
+        .replace("{{keyFunctions}}", data.keyFunctions || "")
+        .replace("{{fallbackBehavior}}", data.fallbackBehavior || "")
+        .replace("{{knowledgeLevel}}", data.knowledgeLevel || "")
+        .replace("{{privacyNeeds}}", data.privacyNeeds || "")
+}
+
+// Function to handle user input and generate a response
+async function handleUserInput(userInput) {
+    if (process.env.MOCK_MODE === "true") {
+        console.log(config);
+        return { content: "Placeholder response." };
+    } else {
         try {
-            const messages = [
-                { role: "system", content: "You are a helpful assistant." },
-                { role: "user", content: userInput },
-            ];
-            const response = await chatBot.invoke(messages);
-            console.log("Response:", response);
+            // Pass the user input as a question
+            console.log(chain)
+            if(typeof userInput == "string")
+                console.log("it's a string.");
+            const response = await chain.invoke({ question : userInput });
+            console.log(response)
+            console.log("Response:", response.text);
             return response;
         } catch (error) {
             console.error("Error generating response:", error.message);
@@ -89,4 +92,5 @@ async function handleUserInput(userInput) {
     }
 }
 
-module.exports = { handleUserInput, updateConfigWithJson };
+
+module.exports = { handleUserInput, updateConfigWithMongoData };

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Box, TextField, Button, Typography, List, ListItem, ListItemText, Paper } from '@mui/material';
 import { styled } from '@mui/material/styles';
@@ -43,6 +43,19 @@ const Chatbox = () => {
   const { projId } = useParams();
   const loggedInUser = localStorage.getItem('loggedInUser');
   const hasPurchased = localStorage.getItem('hasPurchased');
+
+  useEffect(() => {
+    if (loggedInUser && projId) {
+      axios
+        .post('http://localhost:9000/configureChatbot', { projId })
+        .then((response) => {
+          console.log(response)
+        })
+        .catch((error) => {
+          console.error('Error configuring chatbot:', error);
+        });
+    }
+  }, [loggedInUser, projId]);
 
   const botResponses = [
     "Hello! How can I assist you today?",

@@ -35,10 +35,11 @@ const CreateChatbot = () => {
                 owner: loggedInUser,
                 name: botName,
                 purpose: purpose,
+                audience: audience,
                 knowledgeLevel: knowledge,
                 languageStyles: selectedLanguageStyles,
                 personalityTraits: selectedPersonalities,
-                keyFunctionalities: keyFunctionalities,
+                keyFunctions: keyFunctionalities,
                 fallBackBehavior: fallbackBehavior,
                 privacyNeeds: privacyNeeds
             });

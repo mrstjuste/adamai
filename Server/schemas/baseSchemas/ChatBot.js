@@ -11,7 +11,7 @@ const ChatbotSchema = new mongoose.Schema({
   knowledgeLevel: String,
   languageStyles: [String],
   personalityTraits: [String],
-  keyFunctionalities: String,
+  keyFunctions: String,
   fallBackBehavior: String,
   privacyNeeds: String
 });
